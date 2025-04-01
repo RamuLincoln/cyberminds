@@ -39,22 +39,26 @@ def admin():
             print(request)
             data = request.get_json()
             print(data)
-            query = "INSERT INTO jobs (job_title, company_name, location, job_type, salary_min, salary_max, application_deadline, job_description) VALUES (%s, %s, %s, %s,%s, %s, %s, %s)"
-            # values = (data['job_title'], data['company_name'], data['location'], data['job_type'], data['salary_min'], data['salary_max'], data['application_deadline'], data['job_description'])
-            values = (
-                data.get('job_title'),
-                data.get('company_name', ''),
-                data.get('location', ''),
-                data.get('job_type', ''),
-                data.get('salary_min', ''),
-                data.get('salary_max', ''),
-                data.get('application_deadline', ''),
-                data.get('job_description')
-            )
+            query = """INSERT INTO jobs (job_title, company_name, location, job_type, salary_min, salary_max, application_deadline, job_description) VALUES (%s, %s, %s, %s,%s, %s, %s, %s)"""
+            values = (data['job_title'], data['company_name'], data['location'], data['job_type'], data['salary_min'], data['salary_max'], data['application_deadline'], data['job_description'])
+            # values = (
+            #     data.get('job_title'),
+            #     data.get('company_name', ''),
+            #     data.get('location', ''),
+            #     data.get('job_type', ''),
+            #     data.get('salary_min', ''),
+            #     data.get('salary_max', ''),
+            #     data.get('application_deadline', ''),
+            #     data.get('job_description','')
+            # )
             cur = getCursor()
+            print(values)
             cur.execute(query, values)
+            cur.execute("select job_title, company_name, location, job_type, salary_min, salary_max, application_deadline,job_description from jobs")
+            job = cur.fetchall()
+            print(job)
             response = make_response(jsonify({"data":job}))
-            return response, jsonify({"message": "Job added successfully!"})
+            return response
         except Exception as e:
             return jsonify({"error": str(e)})
     cur = getCursor()
@@ -66,7 +70,6 @@ def admin():
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     return response
-    return render_template("admin.html",job=job)
 
 
 if __name__ == "__main__":
